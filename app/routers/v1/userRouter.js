@@ -1,4 +1,7 @@
 const Router = require("koa-router");
+const { get } = require("lodash");
+const { ReturnResponse } = require("../../core/returnResponse");
+const { UserService } = require("../../services/user");
 
 const router = new Router({
     prefix: "/api/v1/user"
@@ -31,6 +34,25 @@ router.get("/:id", ctx => {
             }
         }
     };
+});
+
+// 创建一个新用户
+router.post("/create", async ctx => {
+    const user = ctx.request.body;
+    const res = await UserService.createUser(user);
+    if (res) {
+        ctx.body = {
+            code: ReturnResponse.CODE.SUCCESS,
+            msg: "用户创建成功",
+            data: { user: get(res, "dataValues") }
+        };
+    } else {
+        ctx.body = {
+            code: ReturnResponse.CODE.ERROR,
+            msg: "用户创建失败",
+            data: null
+        };
+    }
 });
 
 module.exports = router;
